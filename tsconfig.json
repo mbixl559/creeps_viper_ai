@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+      "allowJs": true,
+      "target": "es2017",
+      "newLine": "CRLF",
+      "module": "ESNext",
+      "moduleResolution": "Node",
+      // "declaration": true,
+      // "declarationDir": "declarations",
+      "outDir": "tsc_out",
+      "baseUrl": "src/",
+      "sourceMap": false,
+      "strict": false,
+      "strictPropertyInitialization": false,
+      "noImplicitThis": false,
+      "skipLibCheck": true,
+      "experimentalDecorators": true,
+      "allowUnusedLabels": true,
+      "allowSyntheticDefaultImports": true,
+      "allowUnreachableCode": false,
+      "removeComments": false
+    },
+    "include": [
+      "src/main.ts"],
+    "exclude": [
+      "node_modules"
+    ],
+    "typedocOptions": {
+      "mode": "file",
+      "out": "../docs",
+      "ignoreCompilerErrors": true,
+      "excludeNotExported": true,
+      "readme": "none"
+    }
+  }
