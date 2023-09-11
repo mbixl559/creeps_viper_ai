@@ -1,9 +1,10 @@
-import { BODY_COSTS, ROLE_SIMPLE_MINER, ROLE_SIMPLE_UPGRADER, ROLE_SIMPLE_BUILDER, ROLE_TRANSPORT_MINER } from "./constants";
+import { BODY_COSTS, ROLE_SIMPLE_MINER, ROLE_SIMPLE_UPGRADER, ROLE_SIMPLE_BUILDER, ROLE_TRANSPORT_MINER, EXTENTIONS_PER_RCL } from "./constants";
 import { SimpleWorker } from "./creeps/simple_worker";
 import { TransportMiner } from "./creeps/mining/transport_miner";
 import { MiningManager } from "./mining/mining_manager";
 import {IDGenerator} from "./utils/id_generator";
 import {Order} from "./order";
+import { max } from "lodash";
 
 export class RoomManager {
     
@@ -75,7 +76,7 @@ export class RoomManager {
         if(!this.room.memory.source_roads){
             this.layPathsToSources();
         }
-        if(!this.room.memory.spawn_roads) {
+        if(!this.room.memory.spawn_roads) { // Lay Spawn Roads
             var spawn = this.spawns[0];
             var area = this.room.lookAtArea(spawn.pos.y-1, spawn.pos.x - 1, spawn.pos.y+1, spawn.pos.x + 1, true);
             for(var i = 0; i < area.length; i++) {
@@ -94,6 +95,15 @@ export class RoomManager {
             }
             this.room.memory.spawn_roads = true;
         }
+
+        let maxExtentions = EXTENTIONS_PER_RCL[this.getRcl()];
+        if(!this.room.memory.extentions || this.room.memory.extentions < maxExtentions) {
+            layExtention();
+        }
+    }
+
+    layExtention() {
+        var spawn = this.spawns[0];
     }
 
     run() {
@@ -150,7 +160,7 @@ export class RoomManager {
             let max_space = this.mining_manager.max_mining_space();
             let construction_sites = this.room.find(FIND_MY_CONSTRUCTION_SITES);
             if(numWorkers < this.mining_manager.max_mining_space()) {
-                if(numMiners == 0 || (numUpgraders > 0 && numMiners < Math.floor(max_space * miningRatio))) {
+                if(numMiners == 0 || (numUpgraders > 0 && numMiners < Math.ceil(max_space * miningRatio))) {
                     if(_this.getRcl() > 1 && _this.room.energyCapacityAvailable >= TransportMiner.bodyCost()) {
                         console.log("Generating order for " + ROLE_TRANSPORT_MINER);
                         this.orders.push(new Order(TransportMiner.body, ROLE_TRANSPORT_MINER));
@@ -159,10 +169,10 @@ export class RoomManager {
                         this.orders.push(new Order(SimpleWorker.body, ROLE_SIMPLE_MINER));
                     }
                     
-                } else if(numUpgraders < Math.floor(upgradeRatio * max_space)) {
+                } else if(numUpgraders < Math.ceil(upgradeRatio * max_space)) {
                     console.log("Generating order for " + ROLE_SIMPLE_UPGRADER);
                     this.orders.push(new Order(SimpleWorker.body, ROLE_SIMPLE_UPGRADER));
-                } else if(numBuilders < Math.floor(buildRatio * max_space)){
+                } else if(numBuilders < Math.ceil(buildRatio * max_space)){
                     console.log("Generating order for " + ROLE_SIMPLE_BUILDER);
                     this.orders.push(new Order(SimpleWorker.body, ROLE_SIMPLE_BUILDER));
                 }
